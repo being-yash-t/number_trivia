@@ -27,7 +27,7 @@ void main() {
         .thenAnswer((_) => Future.value(const Right(tNumberTrivia)));
 
     // act
-    final result = await useCase(number: tNumber);
+    final result = await useCase(const Params(number: tNumber));
 
     // assert & verify
     expect(result, const Right(tNumberTrivia));
