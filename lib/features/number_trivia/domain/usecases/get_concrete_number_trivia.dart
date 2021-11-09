@@ -8,6 +8,6 @@ class GetConcreteNumberTrivia {
 
   GetConcreteNumberTrivia(this.repository);
 
-  Future<Either<BasicFailure, NumberTrivia>> execute({required int number}) =>
+  Future<Either<BasicFailure, NumberTrivia>> call({required int number}) =>
       repository.getFromNumber(number);
 }
