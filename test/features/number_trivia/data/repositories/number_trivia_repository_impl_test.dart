@@ -35,6 +35,24 @@ void main() {
     );
   });
 
+  void runTestsOnline(Function body) {
+    group('device is online', () {
+      setUp(() {
+        when(mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+      });
+      body();
+    });
+  }
+
+  void runTestsOffline(Function body) {
+    group('device is offline', () {
+      setUp(() {
+        when(mockNetworkInfo.isConnected).thenAnswer((_) async => false);
+      });
+      body();
+    });
+  }
+
   group('getConcreteNumberTrivia', () {
     const tNumber = 1;
     const tNumberTriviaModel =
@@ -50,11 +68,7 @@ void main() {
     //   verify(mockNetworkInfo.isConnected);
     // });
 
-    group('device is online', () {
-      setUp(() {
-        when(mockNetworkInfo.isConnected).thenAnswer((_) async => true);
-      });
-
+    runTestsOnline(() {
       test('should return remote data when call to remote data is successful',
           () async {
         // arrange
@@ -93,11 +107,7 @@ void main() {
       });
     });
 
-    group('device is offline', () {
-      setUp(() {
-        when(mockNetworkInfo.isConnected).thenAnswer((_) async => false);
-      });
-
+    runTestsOffline(() {
       test('should return last locally cached data when cached data is preset',
           () async {
         // arrange
