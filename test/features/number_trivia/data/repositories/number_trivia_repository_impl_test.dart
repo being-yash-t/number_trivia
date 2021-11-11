@@ -135,4 +135,85 @@ void main() {
       });
     });
   });
+
+  group('getRandomNumberTrivia', () {
+    const tNumberTriviaModel = NumberTriviaModel(text: "1 text", number: 1);
+    const NumberTrivia tNumberTrivia = tNumberTriviaModel;
+
+    // test('should check if device is online', () async {
+    //   // arrange
+    //   when(mockNetworkInfo.isConnected).thenAnswer((_) async => true);
+    //   // act
+    //   repositoryImpl.getFromNumber(tNumber);
+    //   // assert & verify
+    //   verify(mockNetworkInfo.isConnected);
+    // });
+
+    runTestsOnline(() {
+      test('should return remote data when call to remote data is successful',
+          () async {
+        // arrange
+        when(mockRemoteDS.getRandom())
+            .thenAnswer((_) async => tNumberTriviaModel);
+        // act
+        final res = await repositoryImpl.getRandom();
+        // assert & verify
+        verify(mockRemoteDS.getRandom());
+        expect(res, equals(const Right(tNumberTrivia)));
+      });
+
+      test('should cache data locally when call to remote data is successful',
+          () async {
+        // arrange
+        when(mockRemoteDS.getRandom())
+            .thenAnswer((_) async => tNumberTriviaModel);
+        // act
+        await repositoryImpl.getRandom();
+        // assert & verify
+        verify(mockRemoteDS.getRandom());
+        verify(mockLocalDS.cacheNumberTrivia(tNumberTriviaModel));
+      });
+
+      test(
+          'should return server failure when call to remote data is unsuccessful',
+          () async {
+        // arrange
+        when(mockRemoteDS.getRandom()).thenThrow(ServerException());
+        // act
+        final res = await repositoryImpl.getRandom();
+        // assert & verify
+        verify(mockRemoteDS.getRandom());
+        verifyZeroInteractions(mockLocalDS);
+        expect(res, equals(Left(ServerFailure())));
+      });
+    });
+
+    runTestsOffline(() {
+      test('should return last locally cached data when cached data is preset',
+          () async {
+        // arrange
+        when(mockLocalDS.getLastNumberTrivia())
+            .thenAnswer((_) async => tNumberTriviaModel);
+        // act
+        final res = await repositoryImpl.getRandom();
+        // assert & verify
+        verifyZeroInteractions(mockRemoteDS);
+        verify(mockLocalDS.getLastNumberTrivia());
+        expect(res, equals(const Right(tNumberTrivia)));
+      });
+
+      test(
+          'should return cache failure when call to local data is unsuccessful',
+          () async {
+        // arrange
+        when(mockLocalDS.getLastNumberTrivia()).thenThrow(CachedException());
+        // act
+        final res = await repositoryImpl.getRandom();
+        // assert & verify
+        verifyZeroInteractions(mockRemoteDS);
+        verify(mockLocalDS.getLastNumberTrivia());
+        expect(res, equals(Left(CacheFailure())));
+      });
+    });
+  });
 }
