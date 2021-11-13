@@ -9,7 +9,7 @@ class NumberTriviaRoutes {
 List numberTriviaPages = [
   GetPage(
     name: NumberTriviaRoutes.homeRoute,
-    page: () => const HomePage(),
+    page: () => HomePage(),
     binding: BindingsBuilder.put(() => NumberTriviaController()),
   ),
 ];
